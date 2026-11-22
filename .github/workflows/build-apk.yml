@@ -1,4 +1,8 @@
 # Builds a debug APK for ChessMentor and uploads it as an artifact.
+# Trigger: push to main, or Actions > Build debug APK > Run workflow.
+# No Stockfish sources needed: the CMake stub builds a placeholder
+# lib and the app reports "Stockfish not built yet" (see README §5).
+# To build WITH the real engine, uncomment the Stockfish step below.
 name: Build debug APK
 
 on:
@@ -18,14 +22,20 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
+      # No android-actions/setup-android step: v3 tries to install the
+      # obsolete "tools" package and fails with "Failed to find package
+      # 'tools'". ubuntu-latest already ships an Android SDK at
+      # $ANDROID_HOME, so install the needed packages directly.
       - name: Install SDK packages
         run: |
-          sdkmanager "platform-tools" "platforms;android-34" \
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-34" \
             "build-tools;34.0.0" "cmake;3.22.1" "ndk;26.3.11579264"
-          yes | sdkmanager --licenses
+          yes | "$SDKMANAGER" --licenses
+
+      # - name: Clone Stockfish (optional, for the real engine)
+      #   run: git clone --depth 1 --branch sf_17 https://github.com/official-stockfish/Stockfish.git ../Stockfish
 
       - name: Set up Gradle 8.7
         uses: gradle/actions/setup-gradle@v3
@@ -33,7 +43,10 @@ jobs:
           gradle-version: "8.7"
 
       - name: Build debug APK
+        # Uses system Gradle, not ./gradlew: the local wrapper jar is
+        # incomplete and cannot be pushed via the GitHub API.
         run: gradle assembleDebug --no-daemon --stacktrace
+        # With the real engine: gradle assembleDebug -DSTOCKFISH_DIR=$GITHUB_WORKSPACE/../Stockfish --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
@@ -41,3 +54,4 @@ jobs:
           name: chessmentor-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
