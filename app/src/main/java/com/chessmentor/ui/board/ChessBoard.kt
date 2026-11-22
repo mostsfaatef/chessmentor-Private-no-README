@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -58,7 +59,7 @@ fun ChessBoard(
     var dragStart by remember { mutableStateOf(Offset.Zero) }
 
     BoxWithConstraints(modifier = modifier.fillMaxWidth().aspectRatio(1f)) {
-        val squareSizePx = maxWidth.toPx() / 8f
+        val squareSizePx = with(LocalDensity.current) { maxWidth.toPx() } / 8f
 
         fun squareAt(offset: Offset): Square? {
             val file = (offset.x / squareSizePx).toInt()
