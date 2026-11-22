@@ -276,7 +276,7 @@ class ChessGame {
             PieceType.PAWN -> {
                 // A pawn on the last rank should already have promoted;
                 // guard the bounds so a corrupt position can't crash the app.
-                if (from.rank + dir !in 0..7) return@when
+                if (from.rank + dir !in 0..7) return out
                 val one = Square(from.file, from.rank + dir)
                 if (pieceAt(one) == null) {
                     addPawnMove(one, null)
