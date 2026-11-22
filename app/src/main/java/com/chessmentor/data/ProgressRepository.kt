@@ -34,7 +34,7 @@ class ProgressRepository(private val dao: ProgressDao) {
         timeMs: Long,
         isMate: Boolean = false
     ) {
-        dao.insertPuzzleAttempt(PuzzleAttempt(puzzleId, solved, attempts, timeMs))
+        dao.insertPuzzleAttempt(PuzzleAttempt(puzzleId = puzzleId, solved = solved, attempts = attempts, timeMs = timeMs))
         if (solved) {
             if (isMate) unlock(Achievements.FIRST_MATE)
             if (dao.countDistinctSolvedPuzzles() >= 5) unlock(Achievements.FIVE_PUZZLES)
