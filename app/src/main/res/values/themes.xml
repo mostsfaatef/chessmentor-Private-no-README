@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose handles the actual colours (see ui/theme/Theme.kt).
+         This theme only provides the window background for the splash. -->
+    <style name="Theme.ChessMentor" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+</resources>
